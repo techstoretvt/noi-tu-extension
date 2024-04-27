@@ -1,0 +1,56 @@
+.row.justify-content-center p.cp-text {
+    display: none !important;
+}
+
+.newclass {
+    /* background-color: aqua; */
+}
+
+
+.modeNoiTuContainer {
+    /* background-color: red; */
+    min-width: 200px;
+    min-height: 200px;
+}
+
+.titleThemTuDie,
+.titleThemTuTraLoi {
+    font-weight: bold;
+    font-size: 24px;
+
+}
+
+.wrapThemTuDie,
+.wrapThemTuTraLoi {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.ipBatDau_themTuDie,
+.ipKetThuc_themTuDie,
+.ipBatDau_themTuTraLoi,
+.ipKetThuc_themTuTraLoi {
+    height: 40px;
+}
+
+.btnThemTuDie,
+.btnThemTuTraLoi,
+.btnGoiY {
+    min-height: 40px !important;
+}
+
+.btnGoiY {
+    margin-bottom: 20px;
+}
+
+.btnIconThemTuDie {
+    width: fit-content;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: red;
+    cursor: pointer;
+    padding: 4px 10px;
+}
