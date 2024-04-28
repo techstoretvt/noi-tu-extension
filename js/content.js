@@ -1,7 +1,9 @@
 // alert("hello noi tu")
+
 const link_backend = 'https://server-noi-tu.onrender.com'
 // const link_backend = 'http://localhost:4000'
 let listWord = []
+let typeWord = ''
 
 let spanRef = document.getElementById('currentWord')
 
@@ -17,7 +19,9 @@ let btnIconThemTuDie = document.createElement('div')
 btnIconThemTuDie.innerText = "+ thêm từ die"
 btnIconThemTuDie.classList.add('btnIconThemTuDie')
 
+
 const handleThemTuDie = async (tuBatDau, tuKetThuc) => {
+    console.log('Them die: ', tuBatDau, tuKetThuc);
     let data = {
         tuBatDau,
         tuKetThuc
@@ -45,13 +49,16 @@ const handleNhapTraLoi = async (tuBatDau, tuKetThuc) => {
 
     let data = {
         tuBatDau,
-        tuKetThuc
+        tuKetThuc,
+        typeAdd: 'addNew'
     }
     if (idTimeout)
         clearTimeout(idTimeout)
+
     idTimeout = setTimeout(async () => {
         let wrapKetThuc = document.querySelector('.swal-overlay.swal-overlay--show-modal')
-        if (wrapKetThuc) return;
+        if (wrapKetThuc)
+            data.typeAdd = 'deleteTu'
 
         console.log('Thêm: ', tuBatDau, tuKetThuc);
 
@@ -76,14 +83,39 @@ const handleNhapTraLoi = async (tuBatDau, tuKetThuc) => {
 
 }
 
-setInterval(() => {
-    let btnChoiLai = document.querySelector('button.swal-button.swal-button--confirm')
-    if (!btnChoiLai) return
+const handleXoaTu = async () => {
+    let data = {
+        tuBatDau: currentWord.innerText.split(' ')[0],
+        tuKetThuc: currentWord.innerText.split(' ')[0]
+    }
 
+    let response = await fetch(link_backend + '/xoa-tu', {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(data),
+    });
+
+    response = await response.json()
+}
+
+setInterval(() => {
+    let wrapBtnChoiLai = document.querySelector('.swal-overlay.swal-overlay--show-modal')
+    let btnChoiLai = document.querySelector('button.swal-button.swal-button--confirm')
+    if (!btnChoiLai || !wrapBtnChoiLai) return
     btnChoiLai.addEventListener('click', () => {
-        console.log('Từ cuối: ', listWord[listWord.length - 1]);
+        // console.log('Từ cuối: ', listWord[listWord.length - 1]);
+        handleXoaTu()
         listWord = []
+        typeWord = ''
     })
+    btnChoiLai.click()
 
 }, 1000);
 
@@ -99,6 +131,8 @@ inputText.onkeydown = (event) => {
             handleNhapTraLoi(data_tl.tuBatDau, data_tl.tuKetThuc)
             data_tl = null
         }
+
+        inputText.style.backgroundColor = '#fff'
 
     }
 }
@@ -172,6 +206,10 @@ const observer = new MutationObserver((mutations) => {
                     })
 
                 // headTextOld = spanHead.innerText
+                if (typeWord === 'die') {
+                    handleNhapTraLoi(currentWord.innerText.split(' ')[0],
+                        currentWord.innerText.split(' ')[1]);
+                }
 
                 //tìm
                 listWord.push({
@@ -184,23 +222,36 @@ const observer = new MutationObserver((mutations) => {
                     .then(response => {
                         return response.json();
                     }).then(data => {
+                        const eventKeyBoard = new KeyboardEvent('keydown', {
+                            key: 'Enter', // Mã ASCII cho phím enter
+                            keyCode: 13,
+                            char: '\n' // Ký tự tương ứng với phím enter
+                        });
+
+
+
                         if (data.errCode === 0) {
                             inputText.value = data.data
                             inputText.focus();
+                            typeWord = data.type
 
                             if (data.type === 'normal') {
                                 inputText.style.backgroundColor = "green"
+                                inputText.dispatchEvent(eventKeyBoard);
                             }
                             else if (data.type === 'warning') {
                                 inputText.style.backgroundColor = "yellow"
                                 if (data.dataTuDien) {
                                     ipKetThuc_themTuTraLoi.focus()
                                     ipKetThuc_themTuTraLoi.value = data.dataTuDien
+                                    ipKetThuc_themTuTraLoi.dispatchEvent(eventKeyBoard)
                                 }
+                                inputText.dispatchEvent(eventKeyBoard);
                             }
                             else {
                                 inputText.style.backgroundColor = "red"
                                 handleThemTuDie(spanHead.innerText, data.data)
+                                inputText.dispatchEvent(eventKeyBoard);
                             }
 
 
@@ -209,10 +260,16 @@ const observer = new MutationObserver((mutations) => {
                             ipKetThuc_themTuTraLoi.focus()
                             ipKetThuc_themTuTraLoi.value = data.data
                             inputText.style.backgroundColor = "#fff"
+
+                            ipKetThuc_themTuTraLoi.dispatchEvent(eventKeyBoard)
+                            inputText.dispatchEvent(eventKeyBoard);
                         }
                         else {
                             ipKetThuc_themTuTraLoi.focus()
                             inputText.style.backgroundColor = "#fff"
+                            handleThemTuDie(currentWord.innerText.split(' ')[0],
+                                currentWord.innerText.split(' ')[1])
+
                         }
                     })
             }
