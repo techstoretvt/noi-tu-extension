@@ -14,29 +14,34 @@
 }
 
 .titleThemTuDie,
-.titleThemTuTraLoi {
+.titleThemTuTraLoi,
+.titleXoaTu {
     font-weight: bold;
-    font-size: 24px;
+    font-size: 20px;
 
 }
 
 .wrapThemTuDie,
-.wrapThemTuTraLoi {
+.wrapThemTuTraLoi,
+.wrapXoaTu {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
 }
 
 .ipBatDau_themTuDie,
 .ipKetThuc_themTuDie,
 .ipBatDau_themTuTraLoi,
-.ipKetThuc_themTuTraLoi {
+.ipKetThuc_themTuTraLoi,
+.ipBatDau_xoaTu,
+.ipKetThuc_XoaTu {
     height: 40px;
 }
 
 .btnThemTuDie,
 .btnThemTuTraLoi,
-.btnGoiY {
+.btnGoiY,
+.btnXoaTu {
     min-height: 40px !important;
 }
 
@@ -44,7 +49,8 @@
     margin-bottom: 20px;
 }
 
-.btnIconThemTuDie {
+.btnIconThemTuDie,
+.btnIconThemTutraloi {
     width: fit-content;
     height: 30px;
     display: flex;
@@ -53,4 +59,21 @@
     background-color: red;
     cursor: pointer;
     padding: 4px 10px;
+    margin-top: 0px;
+    font-size: 12px;
+}
+
+.btnIconThemTutraloi {
+    background-color: green;
+}
+
+.jtextfill {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: center;
+}
+
+#currentWord {
+    font-size: 25px !important;
 }
