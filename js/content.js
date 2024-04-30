@@ -4,11 +4,11 @@ const link_backend = 'https://server-noi-tu.onrender.com'
 // const link_backend = 'http://localhost:4000'
 let listWord = []
 let typeWord = ''
+let waiting = false
 
 let spanRef = document.getElementById('currentWord')
 
 let container = document.getElementsByClassName("container")[0]
-container?.classList?.add('newclass');
 
 let groupText = document.getElementById('group-text')
 let inputText = document.getElementById('text')
@@ -20,100 +20,38 @@ btnIconThemTuDie.innerText = "+ thêm từ die"
 btnIconThemTuDie.classList.add('btnIconThemTuDie')
 
 
-const handleThemTuDie = async (tuBatDau, tuKetThuc) => {
-    console.log('Them die: ', tuBatDau, tuKetThuc);
-    let data = {
-        tuBatDau,
-        tuKetThuc
-    }
 
-    let response = await fetch(link_backend + '/them-tu-die', {
-        method: "POST",
-        mode: "cors",
-        cache: "no-cache",
-        credentials: "same-origin",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        redirect: "follow",
-        referrerPolicy: "no-referrer",
-        body: JSON.stringify(data),
-    });
-
-    response = await response.json()
-
-}
 
 let idTimeout
-const handleNhapTraLoi = async (tuBatDau, tuKetThuc) => {
 
-    let data = {
-        tuBatDau,
-        tuKetThuc,
-        typeAdd: 'addNew'
-    }
-    if (idTimeout)
-        clearTimeout(idTimeout)
+window.addEventListener('beforeunload', function (event) {
+    // Thêm mã xử lý của bạn ở đây
+    // Sự kiện này sẽ được kích hoạt trước khi người dùng rời khỏi trang web
+    // Bạn có thể trả về một chuỗi để hiển thị một thông báo cảnh báo trước khi rời khỏi trang web
+    var confirmationMessage = 'Bạn có chắc chắn muốn rời khỏi trang này?';
+    (event || window.event).returnValue = confirmationMessage;
+    return confirmationMessage;
+});
 
-    idTimeout = setTimeout(async () => {
-        let wrapKetThuc = document.querySelector('.swal-overlay.swal-overlay--show-modal')
-        if (wrapKetThuc)
-            data.typeAdd = 'deleteTu'
-
-        console.log('Thêm: ', tuBatDau, tuKetThuc);
-
-        let response = await fetch(link_backend + '/them-tra-loi', {
-            method: "POST",
-            mode: "cors",
-            cache: "no-cache",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            redirect: "follow",
-            referrerPolicy: "no-referrer",
-            body: JSON.stringify(data),
-        });
-
-        response = await response.json()
-
-    }, 1300);
-
-
-
-}
-
-const handleXoaTu = async () => {
-    let data = {
-        tuBatDau: currentWord.innerText.split(' ')[0],
-        tuKetThuc: currentWord.innerText.split(' ')[0]
-    }
-
-    let response = await fetch(link_backend + '/xoa-tu', {
-        method: "POST",
-        mode: "cors",
-        cache: "no-cache",
-        credentials: "same-origin",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        redirect: "follow",
-        referrerPolicy: "no-referrer",
-        body: JSON.stringify(data),
-    });
-
-    response = await response.json()
-}
-
+let countWaiting = 0
 setInterval(() => {
     let wrapBtnChoiLai = document.querySelector('.swal-overlay.swal-overlay--show-modal')
     let btnChoiLai = document.querySelector('button.swal-button.swal-button--confirm')
-    if (!btnChoiLai || !wrapBtnChoiLai) return
+    let nameBtnChoiLai = document.querySelector('.swal-text')
+    if (!btnChoiLai || !wrapBtnChoiLai || !nameBtnChoiLai || waiting) {
+        if (waiting) countWaiting++
+        if (countWaiting === 2) {
+            countWaiting = 0;
+            waiting = false
+        }
+        return
+    }
     btnChoiLai.addEventListener('click', () => {
         // console.log('Từ cuối: ', listWord[listWord.length - 1]);
-        handleXoaTu()
         listWord = []
         typeWord = ''
+
+        // location.reload()
     })
     btnChoiLai.click()
 
@@ -122,14 +60,23 @@ setInterval(() => {
 let data_tl = null
 
 inputText.onkeydown = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && inputText.innerText) {
         listWord.push({
             tuBatDau: currentWord.innerText.split(' ')[0],
             tuKetThuc: currentWord.innerText.split(' ')[1]
         })
         if (data_tl !== null) {
-            handleNhapTraLoi(data_tl.tuBatDau, data_tl.tuKetThuc)
+            handleNhapTraLoi(data_tl.tuBatDau, data_tl.tuKetThuc, 'TL die: ')
             data_tl = null
+        }
+        else {
+            setTimeout(() => {
+                let wrapKetThuc = document.querySelector('.swal-overlay.swal-overlay--show-modal')
+                waiting = false
+                if (wrapKetThuc)
+                    handleXoaTu()
+
+            }, 1200);
         }
 
         inputText.style.backgroundColor = '#fff'
@@ -207,6 +154,8 @@ const observer = new MutationObserver((mutations) => {
 
                 // headTextOld = spanHead.innerText
                 if (typeWord === 'die') {
+                    console.log("TL die: ", currentWord.innerText.split(' ')[0],
+                        currentWord.innerText.split(' ')[1]);
                     handleNhapTraLoi(currentWord.innerText.split(' ')[0],
                         currentWord.innerText.split(' ')[1]);
                 }
@@ -238,6 +187,7 @@ const observer = new MutationObserver((mutations) => {
                             if (data.type === 'normal') {
                                 inputText.style.backgroundColor = "green"
                                 inputText.dispatchEvent(eventKeyBoard);
+
                             }
                             else if (data.type === 'warning') {
                                 inputText.style.backgroundColor = "yellow"
@@ -250,7 +200,8 @@ const observer = new MutationObserver((mutations) => {
                             }
                             else {
                                 inputText.style.backgroundColor = "red"
-                                handleThemTuDie(spanHead.innerText, data.data)
+
+                                handleThemTuDie(spanHead.innerText, data.data, "Update die: ")
                                 inputText.dispatchEvent(eventKeyBoard);
                             }
 
@@ -273,6 +224,7 @@ const observer = new MutationObserver((mutations) => {
                         }
                     })
             }
+
         }
     });
 });
@@ -299,6 +251,7 @@ ipKetThuc_themTuTraLoi.placeholder = "Từ kết thúc"
 
 ipKetThuc_themTuTraLoi.onkeydown = (event) => {
     if (event.key === 'Enter' && ipKetThuc_themTuTraLoi.value) {
+        waiting = true
         let tuBatDau = spanHead.innerText
         inputText.value = ipKetThuc_themTuTraLoi.value
 
@@ -310,6 +263,12 @@ ipKetThuc_themTuTraLoi.onkeydown = (event) => {
         }
 
         ipKetThuc_themTuTraLoi.value = ''
+        const eventKeyBoard = new KeyboardEvent('keydown', {
+            key: 'Enter', // Mã ASCII cho phím enter
+            keyCode: 13,
+            char: '\n' // Ký tự tương ứng với phím enter
+        });
+        inputText.dispatchEvent(eventKeyBoard)
 
     }
 
@@ -325,3 +284,93 @@ modeNoiTuContainer.appendChild(wrapThemTuTraLoi);
 container.appendChild(modeNoiTuContainer);
 
 
+
+
+
+const handleThemTuDie = async (tuBatDau, tuKetThuc, mess) => {
+    mess = mess ? mess : 'Them die: '
+    console.log(mess, tuBatDau, tuKetThuc);
+    let data = {
+        tuBatDau,
+        tuKetThuc
+    }
+
+    let response = await fetch(link_backend + '/them-tu-die', {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(data),
+    });
+
+    response = await response.json()
+
+}
+
+
+const handleNhapTraLoi = async (tuBatDau, tuKetThuc, mess) => {
+    mess = mess ? mess : 'Them: '
+    let data = {
+        tuBatDau,
+        tuKetThuc,
+        typeAdd: 'addNew'
+    }
+    if (idTimeout)
+        clearTimeout(idTimeout)
+
+    idTimeout = setTimeout(async () => {
+        waiting = false
+        let wrapKetThuc = document.querySelector('.swal-overlay.swal-overlay--show-modal')
+        if (wrapKetThuc)
+            data.typeAdd = 'deleteTu'
+
+        console.log(mess, tuBatDau, tuKetThuc);
+
+        let response = await fetch(link_backend + '/them-tra-loi', {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(data),
+        });
+
+        response = await response.json()
+
+    }, 1200);
+
+
+
+}
+
+const handleXoaTu = async () => {
+    let data = {
+        tuBatDau: currentWord.innerText.split(' ')[0],
+        tuKetThuc: currentWord.innerText.split(' ')[1]
+    }
+    console.log('Xoa: ', data.tuBatDau, data.tuKetThuc);
+
+    let response = await fetch(link_backend + '/xoa-tu', {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(data),
+    });
+
+    response = await response.json()
+}

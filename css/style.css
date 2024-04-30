@@ -77,3 +77,32 @@
 #currentWord {
     font-size: 25px !important;
 }
+
+
+
+.error {
+    animation: shake 0.2s ease-in-out 0s infinite;
+    box-shadow: 0 0 0.5em red !important;
+}
+
+@keyframes shake {
+    0% {
+        margin-left: 0rem;
+        background-color: red !important;
+    }
+
+    25% {
+        margin-left: 0.5rem;
+        background-color: yellow !important;
+    }
+
+    75% {
+        margin-left: -0.5rem;
+        background-color: red !important;
+    }
+
+    100% {
+        margin-left: 0rem;
+        background-color: yellow !important;
+    }
+}

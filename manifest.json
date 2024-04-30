@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Hello Extensions",
+    "name": "Mode nối từ",
     "description": "Base Level Extension",
     "version": "1.0",
     "action": {
@@ -10,14 +10,15 @@
     "content_scripts": [
         {
             "js": [
-                "js/content.js"
+                "js/contentv2.js"
             ],
             "css": [
                 "css/style.css"
             ],
             "matches": [
                 "https://noitu.pro/solo",
-                "https://noitu.pro/"
+                "https://noitu.pro/",
+                "https://shopee.vn/*"
             ]
         }
     ]
