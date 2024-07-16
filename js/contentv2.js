@@ -1,4 +1,6 @@
 //redirect
+//"default_popup": "hello.html",
+
 let url = window.location.hostname;
 console.log(url);
 if (url === 'shopee.vn') {
@@ -23,6 +25,9 @@ const link_backend = 'https://server-noi-tu.onrender.com'
 let typeWord = ''
 let waitingTraLoi = false
 let soLanThua = 0
+let soLanChơi = 0
+let idTimeoutReset
+
 
 // inputText.classList.add('error')
 
@@ -88,6 +93,10 @@ const autoReplay = () => {
             listWord = []
             waitingTraLoi = false
             document.title = document.querySelector('h6.score>span.elo')?.innerText
+            soLanChơi++
+            if (soLanChơi > 10) {
+                location.reload();
+            }
 
             let titleReplay = formReplay.querySelector('.swal-text')
             if (titleReplay?.innerText === 'Bạn đã thua') {
@@ -109,8 +118,11 @@ const autoTraLoi = () => {
             if (groupText.style.display === 'none')
                 return
 
-            let arrTextCurrent = currentWord.innerText.split(' ')
+            //init reset game
+            funcHandle.resetGame()
+
             //add array
+            let arrTextCurrent = currentWord.innerText.split(' ')
             listWord.push({
                 tuBatDau: arrTextCurrent[0],
                 tuKetThuc: arrTextCurrent[1]
@@ -197,6 +209,7 @@ const addEvent = () => {
 
         }
     }
+
 
 }
 addEvent();
@@ -285,7 +298,17 @@ class funcHandle {
         response = await response.json()
 
     }
+
+    static resetGame = () => {
+        if (idTimeoutReset)
+            clearTimeout(idTimeoutReset)
+
+        idTimeoutReset = setTimeout(() => {
+            window.location.reload()
+        }, 20000);
+    }
 }
+
 
 /**
  * "label" = 'undefined'
