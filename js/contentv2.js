@@ -13,6 +13,7 @@ let inputText = document.getElementById('text')
 let spanHead = document.getElementById('head')
 let currentWord = document.getElementById('currentWord')
 let groupText = document.getElementById('group-text')
+let wrapListMoreTuVung = document.createElement('div')
 let btnMode
 let formReplay
 const eventKeyBoard = new KeyboardEvent('keydown', {
@@ -49,6 +50,8 @@ getFormReplay();
 const addBtnMode = () => {
     btnMode = document.createElement('button')
     btnMode.innerText = window.localStorage.getItem('thoaiMode') === 'on' ? "Tắt tự động" : 'Bật tự động'
+    btnMode.style.scale = '0.5'
+    btnMode.style.marginLeft = '-50px'
 
     btnMode.onclick = () => {
         console.log('click');
@@ -73,8 +76,56 @@ const addBtnMode = () => {
     }
 
 
+    // more tu vung
+    let wrapInput = document.querySelector('div.input-group.mb-3')
+
+    let detailTag = document.createElement('div')
+    detailTag.style.maxHeight = '200px'
+    detailTag.style.overflow = 'auto'
+
+    let sumaryTag = document.createElement('div')
+    sumaryTag.innerText = "More"
+    sumaryTag.style.backgroundColor = "#000"
+    sumaryTag.style.padding = "10px"
+    sumaryTag.style.borderRadius = "6px"
+    sumaryTag.style.height = "66px"
+    sumaryTag.style.display = "flex"
+    sumaryTag.style.width = "100px"
+    sumaryTag.style.alignItems = "center"
+    sumaryTag.style.justifyContent = "center"
+
+    sumaryTag.onclick = async () => {
+        let res = await funcHandle.getListTuKetThuc(currentWord.innerText.split(' ')[1])
+        wrapListMoreTuVung.innerHTML = ''
+        if (res.errCode === 0) {
+            for (let tuKT of res.data) {
+                let item1 = document.createElement('div')
+                item1.style.backgroundColor = tuKT.type === 'die' ? 'red' : tuKT.type === 'warning' ? 'orange' : '#000'
+                item1.style.textAlign = 'center'
+                item1.style.maxWidth = '100px'
+                item1.style.cursor = 'pointer'
+                item1.innerText = tuKT.label
+                item1.classList.add("itemMoreTuVung")
+                item1.onclick = () => {
+                    inputText.value = tuKT.label
+                    inputText.dispatchEvent(eventKeyBoard)
+                    wrapListMoreTuVung.innerHTML = ''
+                }
+                wrapListMoreTuVung.appendChild(item1)
+            }
+        }
+    }
+
+
+    detailTag.appendChild(sumaryTag)
+    detailTag.appendChild(wrapListMoreTuVung)
+
+    wrapInput.appendChild(detailTag)
+
+
     container.querySelector('.row>.col-4').appendChild(btnMode)
     container.querySelector('.row>.col-4').appendChild(inputTgTraLoi)
+    // container.querySelector('.row>.col-4').appendChild(detailTag)
 
 
 
@@ -358,6 +409,12 @@ class funcHandle {
         idTimeoutReset = setTimeout(() => {
             window.location.reload()
         }, 20000);
+    }
+
+    static getListTuKetThuc = async (tuBatDau) => {
+        let response = await fetch(link_backend + '/list-tu-ket-thuc?tuBatDau=' + tuBatDau)
+        let data = response.json();
+        return data;
     }
 }
 
