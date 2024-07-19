@@ -86,18 +86,19 @@ const autoReplay = () => {
     setInterval(() => {
         // console.log('end game: ', funcHandle.checkEndGame());
         let mode = window.localStorage.getItem('thoaiMode')
-        if (funcHandle.checkEndGame() && !waitingTraLoi && mode === 'on') {
-
-            let btnReplay = formReplay.querySelector('button.swal-button.swal-button--confirm')
+        if (mode === 'on') {
+            //swal-button swal-button--confirm
+            let btnReplay = formReplay?.querySelector('button.swal-button.swal-button--confirm')
             if (!btnReplay) return
+            currentTypeTuVung = 'normal'
             btnReplay.click()
             listWord = []
             waitingTraLoi = false
             document.title = document.querySelector('h6.score>span.elo')?.innerText
-            soLanChơi++
-            if (soLanChơi > 10) {
-                location.reload();
-            }
+            // soLanChơi++
+            // if (soLanChơi > 10) {
+            //     location.reload();
+            // }
 
             let titleReplay = formReplay.querySelector('.swal-text')
             if (titleReplay?.innerText === 'Bạn đã thua') {
@@ -150,8 +151,8 @@ const autoTraLoi = () => {
             if (data.errCode === 1 && data?.mess === "not found" || data.errCode === -1) {
                 // funcHandle.handleThemTuDie(arrTextCurrent[0], arrTextCurrent[1])
                 funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', messTraLoi)
-                inputText.classList.add('error')
 
+                console.log("Tim tu tren online");
                 const response = await fetch(`https://noitu.pro/answer?word=${arrTextCurrent[1]}`);
                 if (response.ok) {
                     const data = await response.json();
@@ -166,6 +167,12 @@ const autoTraLoi = () => {
                             }, timeTl);
                         }
                     }
+                    else {
+                        inputText.classList.add('error')
+                    }
+                }
+                else {
+                    inputText.classList.add('error')
                 }
 
                 return;
@@ -215,23 +222,6 @@ const addEvent = () => {
             inputText.classList.remove('error')
 
             waitingTraLoi = true
-            setTimeout(() => {
-                if (!funcHandle.checkEndGame()) {
-                    funcHandle.handleNhapTraLoi(arrCurrentWord[0], arrCurrentWord[1], 'addNew', 'Them 1: ')
-                    waitingTraLoi = false
-                    return
-                }
-                waitingTraLoi = false
-
-                //xoa tu sai
-                funcHandle.handleXoaTu(arrCurrentWord[0], arrCurrentWord[1])
-
-                //xoa tu trich xuat
-                funcHandle.handleNhapTraLoi(arrCurrentWord[0], arrCurrentWord[1], 'deleteTu', 'Xoa trich xuat: ')
-
-
-            }, 1200);
-
         }
     }
 
@@ -248,7 +238,7 @@ class funcHandle {
             tuKetThuc,
             typeAdd: type
         }
-        // console.log(mess, tuBatDau, tuKetThuc);
+        console.log("Nhap tu moi: ", tuBatDau, tuKetThuc);
         let response = await fetch(link_backend + '/them-tra-loi', {
             method: "POST",
             mode: "cors",
