@@ -27,6 +27,7 @@ let waitingTraLoi = false
 let soLanThua = 0
 let soLanChơi = 0
 let idTimeoutReset
+let currentTypeTuVung = ''
 
 
 // inputText.classList.add('error')
@@ -121,6 +122,8 @@ const autoTraLoi = () => {
             //init reset game
             funcHandle.resetGame()
 
+
+
             //add array
             let arrTextCurrent = currentWord.innerText.split(' ')
             listWord.push({
@@ -128,9 +131,14 @@ const autoTraLoi = () => {
                 tuKetThuc: arrTextCurrent[1]
             })
 
+            if (currentTypeTuVung === 'die') {
+                currentTypeTuVung = 'normal'
+                funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', '')
+            }
+
             //them tu
             let messTraLoi = typeWord === 'die' ? 'TL die: ' : 'Them 2: '
-            funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', messTraLoi)
+            // funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', messTraLoi)
 
             //get goi y
             let newListWord = listWord.filter(item => item.tuBatDau === arrTextCurrent[1])
@@ -140,9 +148,28 @@ const autoTraLoi = () => {
 
             //ko tim thay
             if (data.errCode === 1 && data?.mess === "not found" || data.errCode === -1) {
-                funcHandle.handleThemTuDie(arrTextCurrent[0], arrTextCurrent[1])
+                // funcHandle.handleThemTuDie(arrTextCurrent[0], arrTextCurrent[1])
+                funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', messTraLoi)
                 inputText.classList.add('error')
+
+                const response = await fetch(`https://noitu.pro/answer?word=${arrTextCurrent[1]}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.nextWord.head === arrTextCurrent[1]) {
+                        inputText.value = data.nextWord.tail
+                        funcHandle.handleNhapTraLoi(data.nextWord.head, data.nextWord.tail, 'addNew', messTraLoi)
+                        let mode = window.localStorage.getItem('thoaiMode')
+                        if (mode === 'on') {
+                            let timeTl = window.localStorage.getItem('ThoaiTime') ?? 0;
+                            setTimeout(() => {
+                                inputText.dispatchEvent(eventKeyBoard);
+                            }, timeTl);
+                        }
+                    }
+                }
+
                 return;
+
             }
 
             //tim thay
@@ -162,11 +189,9 @@ const autoTraLoi = () => {
             }
 
             if (data.type === 'die') {
-                funcHandle.handleThemTuDie(spanHead.innerText, inputText.value, "Update die: ")
-            }
-
-            if (data.type2 === 'tuDien') {
-                console.log("Tu dien: ", data.data ?? data.dataTuDien);
+                currentTypeTuVung = 'die'
+            } else {
+                currentTypeTuVung = 'normal'
             }
 
         })
@@ -236,7 +261,7 @@ class funcHandle {
             referrerPolicy: "no-referrer",
             body: JSON.stringify(data),
         });
-        response = await response.json()
+        // response = await response.json()
     }
 
     static checkEndGame = () => {
