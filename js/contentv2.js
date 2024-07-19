@@ -84,9 +84,20 @@ addBtnMode();
 //auto click replay
 const autoReplay = () => {
     setInterval(() => {
+        //check gap tool
+        let nameNguoiChoi = document.querySelector('.score')
+        if (nameNguoiChoi?.innerText.includes('Tool Tự Động vs Tool Tự Động')) {
+            window.location.reload()
+        }
+
+
         // console.log('end game: ', funcHandle.checkEndGame());
         let mode = window.localStorage.getItem('thoaiMode')
         if (mode === 'on') {
+
+
+
+
             //swal-button swal-button--confirm
             let btnReplay = formReplay?.querySelector('button.swal-button.swal-button--confirm')
             if (!btnReplay) return
@@ -100,28 +111,54 @@ const autoReplay = () => {
             //     location.reload();
             // }
 
-            let titleReplay = formReplay.querySelector('.swal-text')
-            if (titleReplay?.innerText === 'Bạn đã thua') {
-                soLanThua++
-                console.log('So lan thua: ', soLanThua);
-            }
+            // let titleReplay = formReplay.querySelector('.swal-text')
+            // if (titleReplay?.innerText === 'Bạn đã thua') {
+            //     soLanThua++
+            //     console.log('So lan thua: ', soLanThua);
+            // }
         }
     }, 1000);
 }
 autoReplay();
 
+
+
+const config = { childList: true, subtree: true, characterData: true };
+const callback = async function (mutationsList, observer) {
+    for (let mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+            console.log('change: ', currentWord.innerText.split(' '));
+            let arrTextCurrent = currentWord.innerText.split(' ')
+            listWord.push({
+                tuBatDau: arrTextCurrent[0],
+                tuKetThuc: arrTextCurrent[1]
+            })
+
+        }
+    }
+};
+
+
+// Tạo một observer instance liên kết với callback function
+const observer = new MutationObserver(callback);
+observer.observe(currentWord, config);
+
 //auto tra loi
 const autoTraLoi = () => {
     const observer = new MutationObserver((mutations) => {
         mutations.forEach(async (mutation) => {
-            if (mutation.type !== 'childList' || mutation.target !== spanHead)
+            if (mutation.type !== 'childList' || mutation.target !== spanHead) {
+                // console.log('tu1: ', currentWord.innerText.split(' '));
                 return
+            }
 
-            if (groupText.style.display === 'none')
+            if (groupText.style.display === 'none') {
+                // console.log('tu2: ', currentWord.innerText.split(' '));
                 return
+            }
 
             //init reset game
-            funcHandle.resetGame()
+            // funcHandle.resetGame()
 
 
 
