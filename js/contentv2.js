@@ -21,7 +21,7 @@ const eventKeyBoard = new KeyboardEvent('keydown', {
     char: '\n'
 });
 let listWord = []
-const link_backend = 'https://server-noi-tu.onrender.com'
+const link_backend = 'https://server-noi-tu-online.onrender.com'
 let typeWord = ''
 let waitingTraLoi = false
 let soLanThua = 0
