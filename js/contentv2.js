@@ -157,6 +157,7 @@ const autoReplay = () => {
             listWord = []
             waitingTraLoi = false
             document.title = document.querySelector('h6.score>span.elo')?.innerText
+            inputText.classList.remove('error')
             // soLanChơi++
             // if (soLanChơi > 10) {
             //     location.reload();
