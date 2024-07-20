@@ -48,6 +48,12 @@ getFormReplay();
 
 //add btn mode
 const addBtnMode = () => {
+    document.querySelector('a.float').style.display = 'none'
+    document.querySelector('h6.score').style.fontSize = '20px'
+    document.querySelector('body').style.backgroundColor = '#000'
+    document.querySelector('body').style.backgroundImage = 'none'
+
+
     btnMode = document.createElement('button')
     btnMode.innerText = window.localStorage.getItem('thoaiMode') === 'on' ? "Tắt tự động" : 'Bật tự động'
     btnMode.style.scale = '0.5'
@@ -68,6 +74,8 @@ const addBtnMode = () => {
     inputTgTraLoi.min = '0'
     inputTgTraLoi.max = '9'
     inputTgTraLoi.type = 'number'
+    inputTgTraLoi.style.color = '#ccc'
+    inputTgTraLoi.style.backgroundColor = '#333'
 
     inputTgTraLoi.onkeydown = (event) => {
         if (event.key === 'Enter' && inputTgTraLoi.value) {
@@ -85,7 +93,7 @@ const addBtnMode = () => {
 
     let sumaryTag = document.createElement('div')
     sumaryTag.innerText = "More"
-    sumaryTag.style.backgroundColor = "#000"
+    sumaryTag.style.backgroundColor = "rgb(38 60 229)"
     sumaryTag.style.padding = "10px"
     sumaryTag.style.borderRadius = "6px"
     sumaryTag.style.height = "66px"
@@ -95,7 +103,12 @@ const addBtnMode = () => {
     sumaryTag.style.justifyContent = "center"
 
     sumaryTag.onclick = async () => {
-        let res = await funcHandle.getListTuKetThuc(currentWord.innerText.split(' ')[1])
+        let arrTextCurrent = currentWord.innerText.split(' ')
+        let newListWord = listWord.filter(item => item.tuBatDau === arrTextCurrent[1])
+            .map(item => item.tuKetThuc)
+
+        sumaryTag.innerText = "Loading..."
+        let res = await funcHandle.getListTuKetThuc(currentWord.innerText.split(' ')[1], newListWord)
         wrapListMoreTuVung.innerHTML = ''
         if (res.errCode === 0) {
             for (let tuKT of res.data) {
@@ -113,6 +126,10 @@ const addBtnMode = () => {
                 }
                 wrapListMoreTuVung.appendChild(item1)
             }
+            sumaryTag.innerText = "More"
+        }
+        else {
+            sumaryTag.innerText = "More"
         }
     }
 
@@ -209,14 +226,8 @@ const autoTraLoi = () => {
             //init reset game
             // funcHandle.resetGame()
 
-
-
-            //add array
             let arrTextCurrent = currentWord.innerText.split(' ')
-            listWord.push({
-                tuBatDau: arrTextCurrent[0],
-                tuKetThuc: arrTextCurrent[1]
-            })
+
 
             if (currentTypeTuVung === 'die') {
                 currentTypeTuVung = 'normal'
@@ -225,6 +236,7 @@ const autoTraLoi = () => {
 
             //them tu
             let messTraLoi = typeWord === 'die' ? 'TL die: ' : 'Them 2: '
+            wrapListMoreTuVung.innerHTML = ''
             // funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', messTraLoi)
 
             //get goi y

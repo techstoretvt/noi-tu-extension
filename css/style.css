@@ -110,3 +110,23 @@
 .itemMoreTuVung:hover {
     background-color: antiquewhite;
 }
+
+a[aria-label="Đóng quảng cáo"] {
+    display: none !important;
+}
+
+h5.time {
+    color: #ff8000 !important;
+}
+
+h3.text-white {
+    font-size: 20px;
+}
+
+div.jtextfill {
+    margin-top: 0px !important;
+}
+
+i.mdi.mdi-counter.text-white.live {
+    display: none;
+}
