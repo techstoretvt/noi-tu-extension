@@ -146,9 +146,6 @@ const autoReplay = () => {
         let mode = window.localStorage.getItem('thoaiMode')
         if (mode === 'on') {
 
-
-
-
             //swal-button swal-button--confirm
             let btnReplay = formReplay?.querySelector('button.swal-button.swal-button--confirm')
             if (!btnReplay) return
@@ -157,7 +154,7 @@ const autoReplay = () => {
             listWord = []
             waitingTraLoi = false
             document.title = document.querySelector('h6.score>span.elo')?.innerText
-            inputText.classList.remove('error')
+            // inputText.classList.remove('error')
             // soLanChơi++
             // if (soLanChơi > 10) {
             //     location.reload();
