@@ -235,10 +235,17 @@ const autoTraLoi = () => {
             let data = await funcHandle.getGoiY(arrTextCurrent[1], newListWord)
             typeWord = data.type
 
+
+
+
             //ko tim thay
             if (data.errCode === 1 && data?.mess === "not found" || data.errCode === -1) {
                 // funcHandle.handleThemTuDie(arrTextCurrent[0], arrTextCurrent[1])
                 funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', messTraLoi)
+
+                let listTuMoi = window.localStorage.getItem('TuMoi') ? JSON.parse(window.localStorage.getItem('TuMoi')) : []
+                listTuMoi.push(arrTextCurrent[0] + ' ' + arrTextCurrent[1])
+                localStorage.setItem("TuMoi", JSON.stringify(listTuMoi))
 
                 console.log("Tim tu tren online");
                 const response = await fetch(`https://noitu.pro/answer?word=${arrTextCurrent[1]}`);
