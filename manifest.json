@@ -4,7 +4,8 @@
     "description": "Base Level Extension",
     "version": "1.0",
     "action": {
-        "default_icon": "hi.png"
+        "default_icon": "noi-tu.png",
+        "default_popup": "hello.html"
     },
     "content_scripts": [
         {

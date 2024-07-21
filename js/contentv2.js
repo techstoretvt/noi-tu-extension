@@ -74,6 +74,7 @@ const addBtnMode = () => {
     inputTgTraLoi.min = '0'
     inputTgTraLoi.max = '9'
     inputTgTraLoi.type = 'number'
+    inputTgTraLoi.style.marginTop = '-20px'
     inputTgTraLoi.style.color = '#ccc'
     inputTgTraLoi.style.backgroundColor = '#333'
 
@@ -141,6 +142,20 @@ const addBtnMode = () => {
 
 
     container.querySelector('.row>.col-4').appendChild(btnMode)
+
+
+
+    let btnOpen10Tab = document.createElement('button')
+    btnOpen10Tab.style.scale = '0.5'
+    btnOpen10Tab.style.marginLeft = '-50px'
+    btnOpen10Tab.style.marginTop = '-30px'
+    btnOpen10Tab.innerText = 'Open Ten'
+    btnOpen10Tab.onclick = () => {
+        for (let i = 0; i < 10; i++) {
+            window.open('https://noitu.pro/solo', '_blank');
+        }
+    }
+    container.querySelector('.row>.col-4').appendChild(btnOpen10Tab)
     container.querySelector('.row>.col-4').appendChild(inputTgTraLoi)
 
 }
