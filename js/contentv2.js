@@ -142,9 +142,6 @@ const addBtnMode = () => {
 
     container.querySelector('.row>.col-4').appendChild(btnMode)
     container.querySelector('.row>.col-4').appendChild(inputTgTraLoi)
-    // container.querySelector('.row>.col-4').appendChild(detailTag)
-
-
 
 }
 addBtnMode();
@@ -171,17 +168,7 @@ const autoReplay = () => {
             listWord = []
             waitingTraLoi = false
             document.title = document.querySelector('h6.score>span.elo')?.innerText
-            // inputText.classList.remove('error')
-            // soLanChơi++
-            // if (soLanChơi > 10) {
-            //     location.reload();
-            // }
 
-            // let titleReplay = formReplay.querySelector('.swal-text')
-            // if (titleReplay?.innerText === 'Bạn đã thua') {
-            //     soLanThua++
-            //     console.log('So lan thua: ', soLanThua);
-            // }
         }
     }, 1000);
 }
@@ -223,7 +210,6 @@ const autoTraLoi = () => {
     const observer = new MutationObserver((mutations) => {
         mutations.forEach(async (mutation) => {
             if (mutation.type !== 'childList' || mutation.target !== spanHead) {
-                // console.log('tu1: ', currentWord.innerText.split(' '));
                 return
             }
 
@@ -231,21 +217,7 @@ const autoTraLoi = () => {
                 return
             }
 
-            //init reset game
-            // funcHandle.resetGame()
-
-            console.log('tu doi phuong: ', currentWord.innerText);
-
-
             let arrTextCurrent = currentWord.innerText.split(' ')
-
-
-            // if (currentTypeTuVung === 'die') {
-            //     currentWord.style.color = '#fff'
-            //     currentTypeTuVung = 'normal'
-            //     console.log('Tìm được từ trả lời mới');
-            //     funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', '')
-            // }
 
 
             wrapListMoreTuVung.innerHTML = ''
@@ -266,7 +238,6 @@ const autoTraLoi = () => {
 
             //ko tim thay
             if (data.errCode === 1 && data?.mess === "not found" || data.errCode === -1) {
-
 
                 let listTuMoi = window.localStorage.getItem('TuMoi') ? JSON.parse(window.localStorage.getItem('TuMoi')) : []
                 listTuMoi.push(arrTextCurrent[0] + ' ' + arrTextCurrent[1])
