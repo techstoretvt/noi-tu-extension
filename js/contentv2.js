@@ -28,7 +28,7 @@ let waitingTraLoi = false
 let soLanThua = 0
 let soLanChơi = 0
 let idTimeoutReset
-let currentTypeTuVung = ''
+let currentTypeTuVung = 'normal'
 
 
 // inputText.classList.add('error')
@@ -161,7 +161,7 @@ const autoReplay = () => {
 
         // console.log('end game: ', funcHandle.checkEndGame());
         let mode = window.localStorage.getItem('thoaiMode')
-        if (mode === 'on') {
+        if (mode === 'on' && funcHandle.checkEndGame()) {
 
             //swal-button swal-button--confirm
             let btnReplay = formReplay?.querySelector('button.swal-button.swal-button--confirm')
@@ -193,12 +193,21 @@ const config = { childList: true, subtree: true, characterData: true };
 const callback = async function (mutationsList, observer) {
     for (let mutation of mutationsList) {
         if (mutation.type === 'childList') {
-            console.log('change: ', currentWord.innerText.split(' '));
+            console.log('change: ', currentWord.innerText, ' - ', currentTypeTuVung);
             let arrTextCurrent = currentWord.innerText.split(' ')
             listWord.push({
                 tuBatDau: arrTextCurrent[0],
                 tuKetThuc: arrTextCurrent[1]
             })
+            if (currentTypeTuVung === 'die') {
+                currentWord.style.color = 'red'
+            }
+            else if (currentTypeTuVung === 'warning') {
+                currentWord.style.color = 'orange'
+            }
+            else {
+                currentWord.style.color = '#fff'
+            }
 
         }
     }
@@ -219,25 +228,35 @@ const autoTraLoi = () => {
             }
 
             if (groupText.style.display === 'none') {
-                // console.log('tu2: ', currentWord.innerText.split(' '));
                 return
             }
 
             //init reset game
             // funcHandle.resetGame()
 
+            console.log('tu doi phuong: ', currentWord.innerText);
+
+
             let arrTextCurrent = currentWord.innerText.split(' ')
 
 
-            if (currentTypeTuVung === 'die') {
-                currentTypeTuVung = 'normal'
-                funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', '')
+            // if (currentTypeTuVung === 'die') {
+            //     currentWord.style.color = '#fff'
+            //     currentTypeTuVung = 'normal'
+            //     console.log('Tìm được từ trả lời mới');
+            //     funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', '')
+            // }
+
+
+            wrapListMoreTuVung.innerHTML = ''
+
+            //kiem tra tu co ton tai
+            let checkTuExit = await funcHandle.kiemTraTuTonTai(arrTextCurrent[0], arrTextCurrent[1])
+            if (!checkTuExit) {
+                console.log('không ton tai');
+                funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1])
             }
 
-            //them tu
-            let messTraLoi = typeWord === 'die' ? 'TL die: ' : 'Them 2: '
-            wrapListMoreTuVung.innerHTML = ''
-            // funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', messTraLoi)
 
             //get goi y
             let newListWord = listWord.filter(item => item.tuBatDau === arrTextCurrent[1])
@@ -245,25 +264,21 @@ const autoTraLoi = () => {
             let data = await funcHandle.getGoiY(arrTextCurrent[1], newListWord)
             typeWord = data.type
 
-
-
-
             //ko tim thay
             if (data.errCode === 1 && data?.mess === "not found" || data.errCode === -1) {
-                // funcHandle.handleThemTuDie(arrTextCurrent[0], arrTextCurrent[1])
-                funcHandle.handleNhapTraLoi(arrTextCurrent[0], arrTextCurrent[1], 'addNew', messTraLoi)
+
 
                 let listTuMoi = window.localStorage.getItem('TuMoi') ? JSON.parse(window.localStorage.getItem('TuMoi')) : []
                 listTuMoi.push(arrTextCurrent[0] + ' ' + arrTextCurrent[1])
                 localStorage.setItem("TuMoi", JSON.stringify(listTuMoi))
 
                 console.log("Tim tu tren online");
-                const response = await fetch(`https://noitu.pro/answer?word=${arrTextCurrent[1]}`);
+                const response = await fetch(`https://noitu.pro/answer?word==${arrTextCurrent[0]} ${arrTextCurrent[1]}`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success && data.nextWord.head === arrTextCurrent[1]) {
                         inputText.value = data.nextWord.tail
-                        funcHandle.handleNhapTraLoi(data.nextWord.head, data.nextWord.tail, 'addNew', messTraLoi)
+                        funcHandle.handleNhapTraLoi(data.nextWord.head, data.nextWord.tail)
                         let mode = window.localStorage.getItem('thoaiMode')
                         if (mode === 'on') {
                             let timeTl = window.localStorage.getItem('ThoaiTime') ?? 0;
@@ -300,8 +315,12 @@ const autoTraLoi = () => {
                 }, timeTl);
             }
 
+
             if (data.type === 'die') {
                 currentTypeTuVung = 'die'
+            }
+            else if (data.type === 'warning') {
+                currentTypeTuVung = 'warning'
             } else {
                 currentTypeTuVung = 'normal'
             }
@@ -327,6 +346,8 @@ const addEvent = () => {
             inputText.classList.remove('error')
 
             waitingTraLoi = true
+
+
         }
     }
 
@@ -336,12 +357,10 @@ addEvent();
 
 //init function
 class funcHandle {
-    static handleNhapTraLoi = async (tuBatDau, tuKetThuc, type, mess) => {
-        mess = mess ? mess : 'Them: '
+    static handleNhapTraLoi = async (tuBatDau, tuKetThuc) => {
         let data = {
             tuBatDau,
             tuKetThuc,
-            typeAdd: type
         }
         console.log("Nhap tu moi: ", tuBatDau, tuKetThuc);
         let response = await fetch(link_backend + '/them-tra-loi', {
@@ -391,6 +410,15 @@ class funcHandle {
         let response = await fetch(link_backend + '/tim-tu-goi-y?tuBatDau=' + tuBatDau + '&listWord=' + listWord)
         let data = response.json();
         return data;
+    }
+
+    static kiemTraTuTonTai = async (tuBatDau, tuKetThuc) => {
+        let response = await fetch(link_backend + `/kiem-tra-tu-ton-tai?tuBatDau=${tuBatDau}&tuKetThuc=${tuKetThuc}`)
+        let data = await response.json();
+        if (data.errCode === 0 && data.isExit) {
+            return true
+        }
+        return false;
     }
 
     static handleThemTuDie = async (tuBatDau, tuKetThuc, mess) => {
