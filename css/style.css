@@ -130,3 +130,10 @@ div.jtextfill {
 i.mdi.mdi-counter.text-white.live {
     display: none;
 }
+
+#leftads,
+#leftads2,
+#rightads,
+#rightads2 {
+    display: none !important;
+}
