@@ -14,6 +14,7 @@ let spanHead = document.getElementById('head')
 let currentWord = document.getElementById('currentWord')
 let groupText = document.getElementById('group-text')
 let wrapListMoreTuVung = document.createElement('div')
+let overlayError = document.createElement('div')
 let btnMode
 let formReplay
 const eventKeyBoard = new KeyboardEvent('keydown', {
@@ -124,6 +125,15 @@ const addBtnMode = () => {
                     inputText.value = tuKT.label
                     inputText.dispatchEvent(eventKeyBoard)
                     wrapListMoreTuVung.innerHTML = ''
+                    overlayError.style.display = 'none'
+                    if (tuKT.type === 'die') {
+                        currentTypeTuVung = 'die'
+                    }
+                    else if (tuKT.type === 'warning') {
+                        currentTypeTuVung = 'warning'
+                    } else {
+                        currentTypeTuVung = 'normal'
+                    }
                 }
                 wrapListMoreTuVung.appendChild(item1)
             }
@@ -158,6 +168,13 @@ const addBtnMode = () => {
     container.querySelector('.row>.col-4').appendChild(btnOpen10Tab)
     container.querySelector('.row>.col-4').appendChild(inputTgTraLoi)
 
+
+
+    overlayError.classList.add('overlayError')
+    overlayError.style.display = 'none'
+
+    document.querySelector('body').appendChild(overlayError)
+
 }
 addBtnMode();
 
@@ -179,6 +196,7 @@ const autoReplay = () => {
             let btnReplay = formReplay?.querySelector('button.swal-button.swal-button--confirm')
             if (!btnReplay) return
             currentTypeTuVung = 'normal'
+            overlayError.style.display = 'none'
             btnReplay.click()
             listWord = []
             waitingTraLoi = false
@@ -210,6 +228,7 @@ const callback = async function (mutationsList, observer) {
             else {
                 currentWord.style.color = '#fff'
             }
+            currentTypeTuVung = 'normal'
 
         }
     }
@@ -236,6 +255,7 @@ const autoTraLoi = () => {
 
 
             wrapListMoreTuVung.innerHTML = ''
+            overlayError.style.display = 'none'
 
             //kiem tra tu co ton tai
             let checkTuExit = await funcHandle.kiemTraTuTonTai(arrTextCurrent[0], arrTextCurrent[1])
@@ -275,10 +295,12 @@ const autoTraLoi = () => {
                     }
                     else {
                         inputText.classList.add('error')
+                        overlayError.style.display = 'block'
                     }
                 }
                 else {
                     inputText.classList.add('error')
+                    overlayError.style.display = 'block'
                 }
 
                 return;
