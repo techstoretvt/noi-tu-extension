@@ -1,6 +1,8 @@
 //redirect
 //"default_popup": "hello.html",
 
+console.log('Hoạt động')
+
 let url = window.location.hostname;
 console.log(url);
 if (url === 'shopee.vn') {
@@ -9,6 +11,8 @@ if (url === 'shopee.vn') {
 
 
 let container = document.getElementsByClassName("container")[0]
+
+
 let inputText = document.getElementById('text')
 let spanHead = document.getElementById('head')
 let currentWord = document.getElementById('currentWord')
@@ -30,7 +34,8 @@ let soLanThua = 0
 let soLanChơi = 0
 let idTimeoutReset
 let currentTypeTuVung = 'normal'
-
+const myName = ""
+const myName2 = ""
 
 // inputText.classList.add('error')
 
@@ -49,7 +54,7 @@ getFormReplay();
 
 //add btn mode
 const addBtnMode = () => {
-    document.querySelector('a.float').style.display = 'none'
+    // document.querySelector('a.float')?.style?.display = 'none'
     document.querySelector('h6.score').style.fontSize = '20px'
     document.querySelector('body').style.backgroundColor = '#000'
     document.querySelector('body').style.backgroundImage = 'none'
@@ -84,6 +89,39 @@ const addBtnMode = () => {
             window.localStorage.setItem('ThoaiTime', +inputTgTraLoi.value * 1000)
         }
     }
+
+    // btn name2 and name2
+    let btnName2 = document.createElement('button')
+    btnName2.innerText = 'Name 2'
+    btnName2.style.scale = '0.5'
+    btnName2.style.marginTop = '-30px'
+    btnName2.style.marginLeft = '-50px'
+    btnName2.onclick = () => {
+        let name2 = prompt('Name 2')
+        localStorage.setItem('name2', name2)
+    }
+
+    let btnName = document.createElement('button')
+    btnName.innerText = 'Name 1'
+    btnName.style.scale = '0.5'
+    btnName.style.marginLeft = '-50px'
+    btnName.style.marginTop = '-30px'
+    btnName.onclick = () => {
+        let name1 = prompt('Name 1')
+        localStorage.setItem('name1', name1)
+    }
+
+    // btn on/off search user
+    let btnIsSearchUser = document.createElement('button')
+    btnIsSearchUser.innerText = 'Tìm'
+    btnIsSearchUser.style.scale = '0.5'
+    btnIsSearchUser.style.marginLeft = '-50px'
+    btnIsSearchUser.style.marginTop = '-30px'
+    btnIsSearchUser.onclick = () => {
+        window.location.hash = "search";
+    }
+
+
 
 
     // more tu vung
@@ -152,6 +190,9 @@ const addBtnMode = () => {
 
 
     container.querySelector('.row>.col-4').appendChild(btnMode)
+    container.querySelector('.row>.col-4').appendChild(btnName)
+    container.querySelector('.row>.col-4').appendChild(btnName2)
+    container.querySelector('.row>.col-4').appendChild(btnIsSearchUser)
 
 
 
@@ -180,16 +221,50 @@ addBtnMode();
 
 //auto click replay
 const autoReplay = () => {
-    setInterval(() => {
+    let idReload = setInterval(() => {
         //check gap tool
         let nameNguoiChoi = document.querySelector('.score')
-        if (nameNguoiChoi?.innerText.includes('Tool Tự Động vs Tool Tự Động')) {
-            window.location.reload()
+        if (nameNguoiChoi?.innerText.includes(`vs`)) {
+            let name1 = localStorage.getItem('name1') ?? ""
+            let name2 = localStorage.getItem('name2') ?? ""
+
+
+            if (nameNguoiChoi?.innerText.includes(`${name1} vs ${name2}`) || name1 === "" || name2 === "" || window.location.hash !== '#search') {
+
+
+                if (document.title !== "OK") document.title = "OK"
+                // // Kiểm tra xem người dùng đã cho phép thông báo chưa
+                // if (Notification.permission === "granted") {
+                //     document.addEventListener('visibilitychange', function () {
+                //         if (document.hidden) {
+                //             new Notification("Quay lại tab này để tiếp tục!");
+                //         }
+                //     });
+                // } else if (Notification.permission !== "denied") {
+                //     Notification.requestPermission().then(permission => {
+                //         if (permission === "granted") {
+                //             // Người dùng đã cho phép
+                //             new Notification("Quay lại tab này để tiếp tục!");
+                //         }
+                //     });
+                // }
+
+
+            }
+            else {
+                clearInterval(idReload)
+                window.location.reload()
+
+            }
         }
+        // if (nameNguoiChoi?.innerText.includes(`${myName} vs ${myName}`)) {
+        //     window.location.reload()
+        // }
 
 
         // console.log('end game: ', funcHandle.checkEndGame());
-        let mode = window.localStorage.getItem('thoaiMode')
+        let mode = window.localStorage.getItem('thoaiMode') ?? 'off'
+
         if (mode === 'on' && funcHandle.checkEndGame()) {
 
             //swal-button swal-button--confirm
@@ -254,6 +329,19 @@ const autoTraLoi = () => {
             let arrTextCurrent = currentWord.innerText.split(' ')
 
 
+            //check reload
+            let nameNguoiChoi = document.querySelector('.score')
+            // if (nameNguoiChoi?.innerText.includes(`vs`)) {
+            //     if (nameNguoiChoi?.innerText.includes(`${myName} vs ${myName2} (`)) {
+            //         // document.title = "OK"
+            //     }
+            //     else {
+            //         return
+
+            //     }
+            // }
+
+
             wrapListMoreTuVung.innerHTML = ''
             overlayError.style.display = 'none'
 
@@ -309,7 +397,7 @@ const autoTraLoi = () => {
 
             //tim thay
             inputText.value = data.dataTuDien && data.dataTuDien !== 'undefined' ? data.dataTuDien : data.data
-            inputText.focus();
+            // inputText.focus();
             if (inputText.value === 'undefined') {
                 console.log('data undefined ne', data);
                 return
