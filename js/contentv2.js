@@ -402,12 +402,21 @@ const autoTraLoi = () => {
                         funcHandle.addListEnd(listWord.map(item => item.tuKetThuc))
                         inputText.classList.add('error')
                         overlayError.style.display = 'block'
+
+                        let mode = window.localStorage.getItem('thoaiMode')
+                        if (mode === 'on') {
+                            location.reload()
+                        }
                     }
                 }
                 else {
                     funcHandle.addListEnd(listWord.map(item => item.tuKetThuc))
                     inputText.classList.add('error')
                     overlayError.style.display = 'block'
+                    let mode = window.localStorage.getItem('thoaiMode')
+                    if (mode === 'on') {
+                        location.reload()
+                    }
                 }
 
                 return;
