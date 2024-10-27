@@ -28,6 +28,7 @@ const eventKeyBoard = new KeyboardEvent('keydown', {
 });
 let listWord = []
 const link_backend = 'https://server-noi-tu-online.onrender.com'
+// const link_backend = 'http://localhost:4001'
 let typeWord = ''
 let waitingTraLoi = false
 let soLanThua = 0
@@ -36,8 +37,13 @@ let idTimeoutReset
 let currentTypeTuVung = 'normal'
 const myName = ""
 const myName2 = ""
+let idReset
 
 // inputText.classList.add('error')
+if (idReset) clearTimeout(idReset)
+idReset = setTimeout(() => {
+    location.reload()
+}, 15000)
 
 //get form replay
 const getFormReplay = () => {
@@ -254,6 +260,7 @@ const autoReplay = () => {
             else {
                 clearInterval(idReload)
                 window.location.reload()
+                return
 
             }
         }
@@ -276,6 +283,12 @@ const autoReplay = () => {
             listWord = []
             waitingTraLoi = false
             document.title = document.querySelector('h6.score>span.elo')?.innerText
+            inputText.classList.remove('error')
+
+            if (idReset) clearTimeout(idReset)
+            idReset = setTimeout(() => {
+                location.reload()
+            }, 15000)
 
         }
     }, 1000);
@@ -382,11 +395,13 @@ const autoTraLoi = () => {
                         }
                     }
                     else {
+                        funcHandle.addListEnd(listWord.map(item => item.tuKetThuc))
                         inputText.classList.add('error')
                         overlayError.style.display = 'block'
                     }
                 }
                 else {
+                    funcHandle.addListEnd(listWord.map(item => item.tuKetThuc))
                     inputText.classList.add('error')
                     overlayError.style.display = 'block'
                 }
@@ -443,6 +458,10 @@ const addEvent = () => {
 
             waitingTraLoi = true
 
+            if (idReset) clearTimeout(idReset)
+            idReset = setTimeout(() => {
+                location.reload()
+            }, 15000)
 
         }
     }
@@ -474,6 +493,22 @@ class funcHandle {
         // response = await response.json()
     }
 
+    static async addListEnd(listWord) {
+        let response = await fetch(link_backend + '/them-list-end', {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify({ listWord }),
+        });
+        response = await response.json()
+    }
+
     static checkEndGame = () => {
         if (!formReplay || !formReplay.classList.contains('swal-overlay--show-modal'))
             return false
@@ -503,7 +538,7 @@ class funcHandle {
     }
 
     static getGoiY = async (tuBatDau, listWord) => {
-        let response = await fetch(link_backend + '/tim-tu-goi-y?tuBatDau=' + tuBatDau + '&listWord=' + listWord)
+        let response = await fetch(link_backend + '/tim-tu-goi-y?tuBatDau=' + tuBatDau + "&listWord=" + JSON.stringify(listWord))
         let data = response.json();
         return data;
     }
