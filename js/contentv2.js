@@ -339,6 +339,10 @@ const autoTraLoi = () => {
                 return
             }
 
+            if (idReset) clearTimeout(idReset)
+            idReset = setTimeout(() => {
+                location.reload()
+            }, 15000)
             let arrTextCurrent = currentWord.innerText.split(' ')
 
 
