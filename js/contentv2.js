@@ -11,16 +11,19 @@ if (url === 'shopee.vn') {
 
 if (!window.location.href.includes('noitu.pro/solo')) {
 
-    let isSolo = window.localStorage.getItem('isSolo') ?? false
+    let isSolo = window.localStorage.getItem('isSolo') ?? "false"
     let url = isSolo === 'true' ? 'https://noitu.pro/solo#search' : 'https://noitu.pro/solo'
 
     window.location.href = url;
 }
 else {
-    let isSolo = window.localStorage.getItem('isSolo') ?? false
+    let isSolo = window.localStorage.getItem('isSolo') ?? "false"
 
     if (isSolo === 'true' && window.location.hash !== '#search') {
         window.location.href = 'https://noitu.pro/solo#search';
+    }
+    if (isSolo === "false" && window.location.hash === '#search')  {
+        window.location.href = 'https://noitu.pro/solo';
     }
 }
 
@@ -78,6 +81,8 @@ getFormReplay();
 const addBtnMode = () => {
     // document.querySelector('a.float')?.style?.display = 'none'
     document.querySelector('h6.score').style.fontSize = '20px'
+    document.querySelector('h6.score').style.transform = "scale(2) translateY(30px)";
+    currentWord.style.transform = "scale(2)";
     document.querySelector('body').style.backgroundColor = '#000'
     document.querySelector('body').style.backgroundImage = 'none'
 
@@ -287,22 +292,22 @@ const autoReplay = () => {
     let idReload = setInterval(() => {
         //check gap tool
         let nameNguoiChoi = document.querySelector('.score')
-        if (nameNguoiChoi?.innerText.includes(`vs`) && !isCheckName) {
+        if (nameNguoiChoi?.innerText.includes(`vs`)) {
             let name1 = localStorage.getItem('name1') ?? ""
             let name2 = localStorage.getItem('name2') ?? ""
             let name3 = localStorage.getItem('name3') ?? ""
             let name4 = localStorage.getItem('name4') ?? ""
 
-
+            let isSolo = localStorage.getItem('isSolo') ?? false
             if (window.location.hash === '#search' && name1 !== "" && name2 !== "" && name3 !== "" && name4 !== "" && !nameNguoiChoi?.innerText.includes(`${name1} vs ${name2}`)
-                && !nameNguoiChoi?.innerText.includes(`${name1} vs ${name3}`) && !nameNguoiChoi?.innerText.includes(`${name1} vs ${name4}`)
+                && !nameNguoiChoi?.innerText.includes(`${name1} vs ${name3}`) && !nameNguoiChoi?.innerText.includes(`${name1} vs ${name4}` )
             ) {
                 clearInterval(idReload)
                 window.location.reload()
                 return
             }
             else {
-                if (document.title !== "OK") document.title = "OK"
+                if (document.title !== "OK" && window.location.hash === '#search') document.title = "OK"
             }
             isCheckName = true
         }
@@ -326,7 +331,6 @@ const autoReplay = () => {
             listWord = []
             myListWord = []
             waitingTraLoi = false
-            document.title = document.querySelector('h6.score>span.elo')?.innerText
             inputText.classList.remove('error')
 
             if (idReset) clearTimeout(idReset)
