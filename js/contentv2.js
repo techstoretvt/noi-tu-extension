@@ -425,7 +425,7 @@ const autoTraLoi = () => {
             //get goi y
             let newListWord = listWord.filter(item => item.tuBatDau === arrTextCurrent[1])
                 .map(item => item.tuKetThuc)
-            let data = await funcHandle.getGoiY(arrTextCurrent[1], newListWord)
+            let data = await funcHandle.getGoiY(arrTextCurrent[1], newListWord, listWord.map(item => item.tuKetThuc))
             typeWord = data.type
 
             //ko tim thay
@@ -619,8 +619,8 @@ class funcHandle {
         response = await response.json()
     }
 
-    static getGoiY = async (tuBatDau, listWord) => {
-        let response = await fetch(link_backend + '/tim-tu-goi-y?tuBatDau=' + tuBatDau + "&listWord=" + JSON.stringify(listWord))
+    static getGoiY = async (tuBatDau, listWord, allListWord) => {
+        let response = await fetch(link_backend + '/tim-tu-goi-y?tuBatDau=' + tuBatDau + "&listWord=" + JSON.stringify(listWord) +'&allListWord=' + JSON.stringify(allListWord))
         let data = response.json();
         return data;
     }
