@@ -9,6 +9,21 @@ if (url === 'shopee.vn') {
     window.location.href = "https://noitu.pro/solo";
 }
 
+if (!window.location.href.includes('noitu.pro/solo')) {
+
+    let isSolo = window.localStorage.getItem('isSolo') ?? false
+    let url = isSolo === 'true' ? 'https://noitu.pro/solo#search' : 'https://noitu.pro/solo'
+
+    window.location.href = url;
+}
+else {
+    let isSolo = window.localStorage.getItem('isSolo') ?? false
+
+    if (isSolo === 'true' && window.location.hash !== '#search') {
+        window.location.href = 'https://noitu.pro/solo#search';
+    }
+}
+
 
 let container = document.getElementsByClassName("container")[0]
 
@@ -27,6 +42,7 @@ const eventKeyBoard = new KeyboardEvent('keydown', {
     char: '\n'
 });
 let listWord = []
+let myListWord = []
 const link_backend = 'https://server-noi-tu-online.onrender.com'
 // const link_backend = 'http://localhost:4001'
 let typeWord = ''
@@ -96,26 +112,55 @@ const addBtnMode = () => {
         }
     }
 
-    // btn name2 and name2
-    let btnName2 = document.createElement('button')
-    btnName2.innerText = 'Name 2'
-    btnName2.style.scale = '0.5'
-    btnName2.style.marginTop = '-30px'
-    btnName2.style.marginLeft = '-50px'
-    btnName2.onclick = () => {
-        let name2 = prompt('Name 2')
-        localStorage.setItem('name2', name2)
-    }
-
+    // btn name1 and name2, ....
     let btnName = document.createElement('button')
     btnName.innerText = 'Name 1'
     btnName.style.scale = '0.5'
     btnName.style.marginLeft = '-50px'
     btnName.style.marginTop = '-30px'
     btnName.onclick = () => {
-        let name1 = prompt('Name 1')
-        localStorage.setItem('name1', name1)
+        let _name1 = localStorage.getItem('name1') ?? ""
+        let name1 = prompt('Name 1', _name1)
+        if (name1)
+            localStorage.setItem('name1', name1)
     }
+
+    let btnName2 = document.createElement('button')
+    btnName2.innerText = 'Name 2'
+    btnName2.style.scale = '0.5'
+    btnName2.style.marginTop = '-30px'
+    btnName2.style.marginLeft = '-50px'
+    btnName2.onclick = () => {
+        let _name2 = localStorage.getItem('name2') ?? ""
+        let name2 = prompt('Name 2', _name2)
+        if (name2)
+            localStorage.setItem('name2', name2)
+    }
+
+    let btnName3 = document.createElement('button')
+    btnName3.innerText = 'Name 3'
+    btnName3.style.scale = '0.5'
+    btnName3.style.marginTop = '-30px'
+    btnName3.style.marginLeft = '-50px'
+    btnName3.onclick = () => {
+        let _name3 = localStorage.getItem('name3') ?? ""
+        let name3 = prompt('Name 3', _name3)
+        if (name3)
+            localStorage.setItem('name3', name3)
+    }
+
+    let btnName4 = document.createElement('button')
+    btnName4.innerText = 'Name 4'
+    btnName4.style.scale = '0.5'
+    btnName4.style.marginTop = '-30px'
+    btnName4.style.marginLeft = '-50px'
+    btnName4.onclick = () => {
+        let _name4 = localStorage.getItem('name4') ?? ""
+        let name4 = prompt('Name 4', _name4)
+        if (name4)
+            localStorage.setItem('name4', name4)
+    }
+
 
     // btn on/off search user
     let btnIsSearchUser = document.createElement('button')
@@ -124,7 +169,15 @@ const addBtnMode = () => {
     btnIsSearchUser.style.marginLeft = '-50px'
     btnIsSearchUser.style.marginTop = '-30px'
     btnIsSearchUser.onclick = () => {
-        window.location.hash = "search";
+        let isSolo = window.localStorage.getItem('isSolo') ?? false
+        if (isSolo === 'true') {
+            window.localStorage.setItem('isSolo', false)
+            window.location.href = 'https://noitu.pro/solo';
+        }
+        else {
+            window.localStorage.setItem('isSolo', true)
+            window.location.href = 'https://noitu.pro/solo#search';
+        }
     }
 
 
@@ -198,6 +251,8 @@ const addBtnMode = () => {
     container.querySelector('.row>.col-4').appendChild(btnMode)
     container.querySelector('.row>.col-4').appendChild(btnName)
     container.querySelector('.row>.col-4').appendChild(btnName2)
+    container.querySelector('.row>.col-4').appendChild(btnName3)
+    container.querySelector('.row>.col-4').appendChild(btnName4)
     container.querySelector('.row>.col-4').appendChild(btnIsSearchUser)
 
 
@@ -209,7 +264,8 @@ const addBtnMode = () => {
     btnOpen10Tab.innerText = 'Open Ten'
     btnOpen10Tab.onclick = () => {
         for (let i = 0; i < 10; i++) {
-            window.open('https://noitu.pro/solo', '_blank');
+            let url = window.location.hash !== '#search' ? "https://noitu.pro/solo" : "https://noitu.pro/solo#search"
+            window.open(url, '_blank');
         }
     }
     container.querySelector('.row>.col-4').appendChild(btnOpen10Tab)
@@ -226,47 +282,34 @@ const addBtnMode = () => {
 addBtnMode();
 
 //auto click replay
+let isCheckName = false
 const autoReplay = () => {
     let idReload = setInterval(() => {
         //check gap tool
         let nameNguoiChoi = document.querySelector('.score')
-        if (nameNguoiChoi?.innerText.includes(`vs`)) {
+        if (nameNguoiChoi?.innerText.includes(`vs`) && !isCheckName) {
             let name1 = localStorage.getItem('name1') ?? ""
             let name2 = localStorage.getItem('name2') ?? ""
+            let name3 = localStorage.getItem('name3') ?? ""
+            let name4 = localStorage.getItem('name4') ?? ""
 
 
-            if (nameNguoiChoi?.innerText.includes(`${name1} vs ${name2}`) || name1 === "" || name2 === "" || window.location.hash !== '#search') {
-
-
-                if (document.title !== "OK") document.title = "OK"
-                // // Kiểm tra xem người dùng đã cho phép thông báo chưa
-                // if (Notification.permission === "granted") {
-                //     document.addEventListener('visibilitychange', function () {
-                //         if (document.hidden) {
-                //             new Notification("Quay lại tab này để tiếp tục!");
-                //         }
-                //     });
-                // } else if (Notification.permission !== "denied") {
-                //     Notification.requestPermission().then(permission => {
-                //         if (permission === "granted") {
-                //             // Người dùng đã cho phép
-                //             new Notification("Quay lại tab này để tiếp tục!");
-                //         }
-                //     });
-                // }
-
-
-            }
-            else {
+            if (window.location.hash === '#search' && name1 !== "" && name2 !== "" && name3 !== "" && name4 !== "" && !nameNguoiChoi?.innerText.includes(`${name1} vs ${name2}`)
+                && !nameNguoiChoi?.innerText.includes(`${name1} vs ${name3}`) && !nameNguoiChoi?.innerText.includes(`${name1} vs ${name4}`)
+            ) {
                 clearInterval(idReload)
                 window.location.reload()
                 return
-
             }
+            else {
+                if (document.title !== "OK") document.title = "OK"
+            }
+            isCheckName = true
         }
         // if (nameNguoiChoi?.innerText.includes(`${myName} vs ${myName}`)) {
         //     window.location.reload()
         // }
+
 
 
         // console.log('end game: ', funcHandle.checkEndGame());
@@ -281,6 +324,7 @@ const autoReplay = () => {
             overlayError.style.display = 'none'
             btnReplay.click()
             listWord = []
+            myListWord = []
             waitingTraLoi = false
             document.title = document.querySelector('h6.score>span.elo')?.innerText
             inputText.classList.remove('error')
@@ -301,12 +345,17 @@ const config = { childList: true, subtree: true, characterData: true };
 const callback = async function (mutationsList, observer) {
     for (let mutation of mutationsList) {
         if (mutation.type === 'childList') {
+            if (idReset) clearTimeout(idReset)
+            idReset = setTimeout(() => {
+                location.reload()
+            }, 15000)
             console.log('change: ', currentWord.innerText, ' - ', currentTypeTuVung);
             let arrTextCurrent = currentWord.innerText.split(' ')
             listWord.push({
                 tuBatDau: arrTextCurrent[0],
                 tuKetThuc: arrTextCurrent[1]
             })
+
             if (currentTypeTuVung === 'die') {
                 currentWord.style.color = 'red'
             }
@@ -343,11 +392,14 @@ const autoTraLoi = () => {
             idReset = setTimeout(() => {
                 location.reload()
             }, 15000)
+
             let arrTextCurrent = currentWord.innerText.split(' ')
 
 
+
+
             //check reload
-            let nameNguoiChoi = document.querySelector('.score')
+            // let nameNguoiChoi = document.querySelector('.score')
             // if (nameNguoiChoi?.innerText.includes(`vs`)) {
             //     if (nameNguoiChoi?.innerText.includes(`${myName} vs ${myName2} (`)) {
             //         // document.title = "OK"
@@ -384,7 +436,7 @@ const autoTraLoi = () => {
                 localStorage.setItem("TuMoi", JSON.stringify(listTuMoi))
 
                 console.log("Tim tu tren online");
-                const response = await fetch(`https://noitu.pro/answer?word==${arrTextCurrent[0]} ${arrTextCurrent[1]}`);
+                const response = await fetch(`https://noitu.pro/answer?word=${arrTextCurrent[0]} ${arrTextCurrent[1]}`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success && data.nextWord.head === arrTextCurrent[1]) {
@@ -399,7 +451,7 @@ const autoTraLoi = () => {
                         }
                     }
                     else {
-                        funcHandle.addListEnd(listWord.map(item => item.tuKetThuc))
+                        funcHandle.addListEnd(myListWord.map(item => item.tuKetThuc))
                         inputText.classList.add('error')
                         overlayError.style.display = 'block'
 
@@ -410,7 +462,7 @@ const autoTraLoi = () => {
                     }
                 }
                 else {
-                    funcHandle.addListEnd(listWord.map(item => item.tuKetThuc))
+                    funcHandle.addListEnd(myListWord.map(item => item.tuKetThuc))
                     inputText.classList.add('error')
                     overlayError.style.display = 'block'
                     let mode = window.localStorage.getItem('thoaiMode')
@@ -433,8 +485,25 @@ const autoTraLoi = () => {
 
             let mode = window.localStorage.getItem('thoaiMode')
             if (mode === 'on') {
+                // check exits
+                const response = await fetch(`https://noitu.pro/answer?word=${arrTextCurrent[1]} ${inputText.value}`);
+
+
+
                 let timeTl = window.localStorage.getItem('ThoaiTime') ?? 0;
-                setTimeout(() => {
+                setTimeout(async () => {
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (!data.success) {
+                            funcHandle.addListEnd(myListWord.map(item => item.tuKetThuc))
+                        }
+                    }
+
+                    myListWord.push({
+                        tuBatDau: arrTextCurrent[0],
+                        tuKetThuc: arrTextCurrent[1]
+                    })
+
                     inputText.dispatchEvent(eventKeyBoard);
                 }, timeTl);
             }
@@ -491,7 +560,7 @@ class funcHandle {
             tuKetThuc,
         }
         console.log("Nhap tu moi: ", tuBatDau, tuKetThuc);
-        let response = await fetch(link_backend + '/them-tra-loi', {
+        fetch(link_backend + '/them-tra-loi', {
             method: "POST",
             mode: "cors",
             cache: "no-cache",
