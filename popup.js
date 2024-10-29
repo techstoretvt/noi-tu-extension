@@ -5,7 +5,20 @@ let txtResult = document.getElementById('ketQua');
 let btnTimKiem = document.getElementById('btnTim');
 
 
-btnTimKiem.onclick = async (event) => {
+ipTuBatDau.focus()
+
+ipTuBatDau.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        // Thực hiện hành động khi nhấn Enter
+        handleTimKiem()
+    }
+});
+
+btnTimKiem.onclick =  (event) => {
+    handleTimKiem()
+}
+
+const handleTimKiem = async () => {
     let tuBatDau = ipTuBatDau.value;
     if (!tuBatDau) return
     let response = await fetch(link_backend + '/list-tu-ket-thuc?tuBatDau=' + tuBatDau)
@@ -18,4 +31,5 @@ btnTimKiem.onclick = async (event) => {
         console.log(strResult);
         txtResult.value = strResult
     }
+    ipTuBatDau.value = ""
 }
